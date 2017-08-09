@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+		<script type="text/javascript">
+			/*
+			目的：将一个表单中的键值序列化为可提交的字符串
+			思路：js高程 14.4表单序列化
+			（1）对表单字段的name和value进行URL编码，使用&号分割
+			（2）不发送禁用的表单字段
+			（3）只发送勾选的复选框checkbox和单选按钮radio
+			（4）不发送type为reset和button的按钮
+			（5）多选选择框中每个选中的值单独一个条目
+			（6）在单击提交按钮提交表单的情况下，也会发送提交按钮；否则不发送提交按钮
+			（7）<select>元素的值，就是选中的<option>元素的value特性的值。如果没有value特性，则选择元素的文本值。
+		    */
+		   
+//表单序列化通用函数
+function serialize(form) {
+	var parts = [],
+		field = null,
+		i, j, len, optLen, option, optValue;
+
+	for(i = 0, len = form.elements.length; i < len; i++) {
+		field = form.elements[i];
+		switch(field.type) {
+			case "select-one": //单选框
+			case "select-multiple": //多选框
+				if(field.name.length) {
+					for(j = 0, optLen = field.options.length; j < optLen; j++) {
+						option = field.options[j];
+						if(option.selected) {
+							optValue = '';
+							if(option.hasAttribute) {
+								optValue = (option.hasAttribute('value') ? option.value : option.text); //非IE
+							} else {
+								optValue = (option.attributes['value'].specified ? option.value : option.text); //IE
+							}
+							parts.push(encodeURIComponent(field.name) + '=' + encodeURIComponent(optValue));
+						}
+					}
+				}
+				break;
+
+			case undefined: //字段集
+			case "file": //文件输入
+			case "submit": //提交按钮
+			case "reset": //重置按钮
+			case "button": //自定义按钮
+				break;
+
+			case "radio": //单选按钮
+			case "checkbox": //复选按钮
+				if(!field.checked) {
+					break;
+				}
+
+			default:
+				//不包含没有名字的表单字段
+				if(field.name.length) {
+					parts.push(encodeURIComponent(field.name) + '=' + encodeURIComponent(field.value));
+				}
+		}
+	}
+	return parts.join("&"); //查寻字符串格式输出
+}
+//页面加载完成调用表单序列化函数(一般是提交按钮，这里只看效果)
+window.onload = function() {
+	var form = document.getElementById('target');
+	console.log(serialize(form));
+};</script>
+</head>
+<body>
+	<!-- 表单数据 -->
+	<form id="target">
+		<select name="age">
+			<option value="aaa">aaa</option>
+			<option value="bbb" selected>bbb</option>
+		</select>
+		<input name="name" value="yangkun">
+		<input type="password" name="password" value="123456">
+		<input type="hidden" name="salery" value="10000">
+		<textarea name="description">my name is yangkun</textarea>
+		<input type="checkbox" name="hobby" value="篮球" checked>篮球
+		<input type="checkbox" name="hobby" value="跑步">跑步
+		<input type="radio" name="sex" value="Female" checked>女生
+		<input type="radio" name="sex" value="Male">男生
+	</form>
+
+</body>
+</html>
