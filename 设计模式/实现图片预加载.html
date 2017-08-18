@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+</head>
+<body>
+	<script>
+	var myImage = (function(){
+		var imgNode = document.createElement( 'img' );
+		document.body.appendChild( imgNode );
+		return {
+			setSrc: function( src ){
+				imgNode.src = src;
+			}
+		}
+	})();
+	// 引入代理对象
+	var proxyImage = (function(){
+		// 创建img对象
+		var img = new Image();
+		// 调用onload方法，加载完后替换掉占位图片
+		img.onload = function(){
+			// 预加载完成后将请求重新交给本体MyImage
+			myImage.setSrc( this.src );
+		}
+		return {
+			setSrc: function( src ){
+				// 加载前先把
+				myImage.setSrc( '本地占位图片地址' );
+				// 将地址传给img对象
+				img.src = src;
+			}
+		}
+	})();
+	proxyImage.setSrc( '网络图片地址' );
+	</script>
+</body>
+</html>
