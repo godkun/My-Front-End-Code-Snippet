@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+</head>
+<body>
+<script type="text/javascript">
+	/**
+	 * @author [杨昆]
+	 * 项目情况：当找到的新的数据资源后，发现与当前数据格式不一致
+	 * 与其改写渲染页面的前端代码，不如增加一个数据转换格式的适配器
+	 */
+
+	var getGuangdongCity = function(){
+		var guangdongCity = [
+		{
+			name: 'shenzhen',
+			id: 11,
+		}, {
+			name: 'guangzhou',
+			id: 12,
+		}
+
+		];
+		return guangdongCity;
+	};
+
+	var render = function( fn ){
+		console.log( '开始渲染广东省地图' );
+		document.write( JSON.stringify( fn() ) );
+	};
+
+	var addressAdapter = function( oldAddressfn ){
+		var address = {},
+		oldAddress = oldAddressfn();
+		for ( var i = 0, c; c = oldAddress[ i++ ]; ){
+			address[ c.name ] = c.id;
+		}
+		return function(){
+			return address;
+		}
+	};
+	render( addressAdapter( getGuangdongCity ) );
+</script>
+
+</body>
+</html>
